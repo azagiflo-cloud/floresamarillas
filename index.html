@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flores Amarillas</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+  background: #020111;
+  user-select: none;
+}
+
+/* Fondo de noche */
+.night {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, #020111 0%, #07152b 55%, #102b18 100%);
+  z-index: 0;
+}
+
+/* Contenedor de luciérnagas */
+#fireflies {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: #fffb96;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ffe600, 0 0 20px #ffe600;
+  animation: float 6s infinite ease-in-out, blink 3s infinite ease-in-out;
+}
+
+/* Contenedor principal de flores */
+.flowers {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  padding-bottom: 50px;
+}
+
+/* Estructura individual de cada flor */
+.flower {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease-out;
+  cursor: pointer;
+}
+
+/* Escalas base */
+.flower--1 { transform: scale(0.85); }
+.flower--2 { transform: scale(1.05); }
+.flower--3 { transform: scale(1.25); z-index: 5; }
+.flower--4 { transform: scale(1.0); }
+.flower--5 { transform: scale(0.8); }
+
+/* Cabeza de la flor */
+.flower__head {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  animation: bloom 2s ease-out forwards;
+}
+
+/* Pétalos */
+.flower__leafs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.flower__leaf {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 45px;
+  height: 80px;
+  margin-top: -80px;
+  margin-left: -22.5px;
+  background: #fce700;
+  border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+  transform-origin: bottom center;
+  box-shadow: 0 0 15px rgba(252, 231, 0, 0.6);
+  transition: filter 0.3s ease;
+}
+
+.flower:hover .flower__leaf {
+  filter: brightness(1.2);
+  box-shadow: 0 0 22px rgba(255, 240, 70, 0.9);
+}
+
+.flower__leaf--1 { transform: rotate(0deg); }
+.flower__leaf--2 { transform: rotate(45deg); }
+.flower__leaf--3 { transform: rotate(90deg); }
+.flower__leaf--4 { transform: rotate(135deg); }
+.flower__leaf--5 { transform: rotate(180deg); }
+.flower__leaf--6 { transform: rotate(225deg); }
+.flower__leaf--7 { transform: rotate(270deg); }
+.flower__leaf--8 { transform: rotate(315deg); }
+
+/* Centro de la flor */
+.flower__center {
+  position: relative;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8b5a2b 40%, #5d3518 100%);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.3);
+  z-index: 6;
+}
+
+/* Tallos */
+.flower__stem {
+  width: 14px;
+  height: 360px;
+  background: linear-gradient(to right, #1d8c24, #146119);
+  border-radius: 7px;
+  position: relative;
+  transform-origin: bottom center;
+  animation: growStem 2.5s ease-out forwards;
+  z-index: 3;
+}
+
+.flower--1 .flower__stem { height: 320px; }
+.flower--2 .flower__stem { height: 380px; }
+.flower--3 .flower__stem { height: 420px; }
+.flower--4 .flower__stem { height: 350px; }
+.flower--5 .flower__stem { height: 300px; }
+
+/* Hojas del tallo */
+.flower__stem__leaf {
+  position: absolute;
+  width: 60px;
+  height: 30px;
+  background: #1aaa15;
+  border-radius: 100% 0 100% 0;
+}
+
+.flower__stem__leaf--left {
+  left: -50px;
+  transform: rotate(-30deg);
+}
+
+.flower__stem__leaf--right {
+  right: -50px;
+  transform: rotate(30deg) scaleX(-1);
+}
+
+/* Césped inferior */
+.grass-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background: #0e5413;
+  z-index: 8;
+  border-top: 5px solid #167d1d;
+}
+
+/* Mensaje flotante compacto */
+.message {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  max-width: 450px;
+  max-height: 50vh;
+  overflow-y: auto;
+  
+  background: rgba(252, 231, 0, 0.92);
+  color: #171717;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  
+  padding: 16px 20px;
+  border-radius: 16px;
+  white-space: normal;
+  word-wrap: break-word;
+  
+  opacity: 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: auto;
+}
+
+.message.visible {
+  opacity: 1;
+}
+
+.message.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -10px);
+}
+
+/* Estilo para la fotografía adjunta */
+.card-photo {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón alternar tarjeta */
+.toggle-btn {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fce700;
+  color: #171717;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.2s, background 0.2s;
+  z-index: 11;
+  opacity: 0;
+  animation: fadeIn 1s forwards 2.2s;
+}
+
+.toggle-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  background: #fff04d;
+}
+
+/* Animaciones */
+@keyframes bloom {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes growStem {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-40px) translateX(20px); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="night"></div>
+<div id="fireflies"></div>
+
+<button class="toggle-btn" onclick="toggleMessage()">Ocultar / Mostrar Mensaje</button>
+
+<div class="message" id="cardMessage">
+  <!-- CAMBIA "tu-foto.jpg" POR LA RUTA DE TU IMAGEN -->
+  <img src="amor.jpeg" alt="Foto especial" class="card-photo">
+  
+  <p>"Hoy el mundo se llena de flores amarillas, pero entre todas ellas no hay ninguna que brille tanto como tú. Aunque hoy no pueda dártelas en persona ni ver tu sonrisa al recibirlas, te las envío de la forma más especial que encontré: programadas línea por línea desde Visual Studio Code. Quiero que recuerdes que te pienso a cada segundo y que, incluso a la distancia, iluminas mi vida. ¡Feliz día de las flores amarillas, mi amor!" 🌻</p>
+</div>
+
+<div class="flowers" id="flowerBed">
+  <div class="flower flower--1" data-scale="0.85">
+    <div class="flower__head">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__leaf flower__leaf--7"></div>
+        <div class="flower__leaf flower__leaf--8"></div>
+      </div>
+      <div class="flower__center"></div>
+    </div>
+    <div class="flower__stem">
+      <div class="flower__stem__leaf flower__stem__leaf--left" style="top: 80px;"></div>
+      <div class="flower__stem__leaf flower__stem__leaf--right" style="top: 180px;"></div>
+    </div>
+  </div>
+
+  <div class="flower flower--2" data-scale="1.05">
+    <div class="flower__head">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__leaf flower__leaf--7"></div>
+        <div class="flower__leaf flower__leaf--8"></div>
+      </div>
+      <div class="flower__center"></div>
+    </div>
+    <div class="flower__stem">
+      <div class="flower__stem__leaf flower__stem__leaf--left" style="top: 100px;"></div>
+      <div class="flower__stem__leaf flower__stem__leaf--right" style="top: 220px;"></div>
+    </div>
+  </div>
+
+  <div class="flower flower--3" data-scale="1.25">
+    <div class="flower__head">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__leaf flower__leaf--7"></div>
+        <div class="flower__leaf flower__leaf--8"></div>
+      </div>
+      <div class="flower__center"></div>
+    </div>
+    <div class="flower__stem">
+      <div class="flower__stem__leaf flower__stem__leaf--left" style="top: 120px;"></div>
+      <div class="flower__stem__leaf flower__stem__leaf--right" style="top: 250px;"></div>
+    </div>
+  </div>
+
+  <div class="flower flower--4" data-scale="1.0">
+    <div class="flower__head">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__leaf flower__leaf--7"></div>
+        <div class="flower__leaf flower__leaf--8"></div>
+      </div>
+      <div class="flower__center"></div>
+    </div>
+    <div class="flower__stem">
+      <div class="flower__stem__leaf flower__stem__leaf--left" style="top: 90px;"></div>
+      <div class="flower__stem__leaf flower__stem__leaf--right" style="top: 190px;"></div>
+    </div>
+  </div>
+
+  <div class="flower flower--5" data-scale="0.8">
+    <div class="flower__head">
+      <div class="flower__leafs">
+        <div class="flower__leaf flower__leaf--1"></div>
+        <div class="flower__leaf flower__leaf--2"></div>
+        <div class="flower__leaf flower__leaf--3"></div>
+        <div class="flower__leaf flower__leaf--4"></div>
+        <div class="flower__leaf flower__leaf--5"></div>
+        <div class="flower__leaf flower__leaf--6"></div>
+        <div class="flower__leaf flower__leaf--7"></div>
+        <div class="flower__leaf flower__leaf--8"></div>
+      </div>
+      <div class="flower__center"></div>
+    </div>
+    <div class="flower__stem">
+      <div class="flower__stem__leaf flower__stem__leaf--left" style="top: 70px;"></div>
+      <div class="flower__stem__leaf flower__stem__leaf--right" style="top: 160px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="grass-container"></div>
+
+<script>
+  // Mostrar mensaje tras la animación inicial
+  setTimeout(() => {
+    document.getElementById('cardMessage').classList.add('visible');
+  }, 2000);
+
+  // Alternar visibilidad del mensaje
+  function toggleMessage() {
+    const card = document.getElementById('cardMessage');
+    if (card.classList.contains('hidden')) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  }
+
+  // Generador de luciérnagas
+  const firefliesContainer = document.getElementById('fireflies');
+  for (let i = 0; i < 25; i++) {
+    const firefly = document.createElement('div');
+    firefly.classList.add('firefly');
+    firefly.style.left = Math.random() * 100 + 'vw';
+    firefly.style.top = Math.random() * 80 + 'vh';
+    firefly.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 3}s`;
+    firefliesContainer.appendChild(firefly);
+  }
+
+  // Balanceo suave con el mouse (Efecto brisa)
+  const flowers = document.querySelectorAll('.flower');
+  document.addEventListener('mousemove', (e) => {
+    const mouseX = e.clientX / window.innerWidth - 0.5;
+    flowers.forEach((flower) => {
+      const scale = parseFloat(flower.getAttribute('data-scale'));
+      const tilt = mouseX * 12;
+      flower.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
+    });
+  });
+</script>
+
+</body>
+</html>

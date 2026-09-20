@@ -1,0 +1,32 @@
+/* Mensaje flotante ajustado más abajo y sin recortes */
+.message {
+  position: absolute;
+  top: 10% !important;              /* ← Lo ubica más abajo (ajusta este % si quieres subirlo o bajarlo más) */
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translate(-50%, 0) !important; /* ← Mantiene la tarjeta perfectamente centrada */
+  
+  width: 10%;
+  max-width: 450px;
+  max-height: 10vh;                 /* ← Permite mostrar bien la foto y el texto sin recortarlos */
+  overflow-y: auto;
+  
+  background: rgba(252, 231, 0, 0.92);
+  color: #171717;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  
+  padding: 16px 20px;
+  border-radius: 16px;
+  white-space: normal;
+  word-wrap: break-word;
+  
+  opacity: 0;
+  animation: fadeIn 1.5s forwards;
+  animation-delay: 2s;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
